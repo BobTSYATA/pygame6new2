@@ -28,6 +28,7 @@ class DQN_Agent:
               self.DQN.train()
           else:
               self.DQN.eval()
+    print("bob")
 
     def get_Action(self, environment, state : State_ONLY_FOR_CALLING, epoch=0, events=None, train=True) -> tuple: #train=False ##########
 
