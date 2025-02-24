@@ -8,7 +8,7 @@ import numpy as np
 class Island(pygame.sprite.Sprite):
     neon_effects = {}  # Dictionary to cache neon effects by (radius, color) key
 
-    def __init__(self, x, y, radius, color, island_type) -> None:
+    def __init__(self, x, y, radius, color, island_type, troop_num = START_TROOPS) -> None:
         super().__init__()
         pygame.font.init()  # Ensure fonts are initialized
         self.font = pygame.font.SysFont("arial", 16)  # Cache font for troop count
@@ -16,8 +16,12 @@ class Island(pygame.sprite.Sprite):
         self.y = y
         self.radius = radius
         self.color = color
-        self.troops = START_TROOPS
         self.type = island_type
+        self.troops = troop_num
+        # if self.type == NEUTRAL:
+        #     self.troops = START_TROOPS - 6
+        # else:
+        #     self.troops = START_TROOPS
         
         # Initialize rect based on position and radius (make sure it's centered)
         self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)

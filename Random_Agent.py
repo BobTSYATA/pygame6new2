@@ -61,7 +61,11 @@ class Random_Agent:
                 #print("tuple(action) + (destination_index,): ", tuple(action) + (destination_index,))
                 # Append the destination island index
                 #print("sending troops")
-                return (action,) + (destination_index,)
+                # if action == 1:
+                #     return ((-1,-1))
+                # print(f"source_island: {source_island}, source_island.troops: {source_island.troops}")
+                return (action,) + (destination_index,) #return ((action,1)) #
+                #return (action,) + (destination_index,)
             else:
                 # No islands to select
                 environment.selected_enemy_islands = None #.clear()

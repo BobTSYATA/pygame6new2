@@ -1,4 +1,3 @@
-
 #TroopUnit.py:
 import pygame
 from CONSTANTS import *
@@ -25,14 +24,6 @@ class TroopUnit(pygame.sprite.Sprite):
         self.image = pygame.Surface((2 * TROOP_UNIT_RADIUS, 2 * TROOP_UNIT_RADIUS))
         self.rect = self.image.get_rect(midbottom=pos)
         self.mask = pygame.mask.from_surface(self.image)
-
-
-        #self.id = TroopUnit.TROOPUNIT_NUM
-
-        #print("self.type: ", self.type)
-        # if self.type == 1:
-        #     TroopUnit.TROOPUNIT_NUM += 1
-            #print("self.id: ",self.id,"state: ", state, "reward: ", reward, "action: ", action)
 
         self.draw_troop_count()
 

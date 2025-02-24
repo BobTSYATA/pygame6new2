@@ -61,4 +61,3 @@ class Human_Agent:
 
             # return (None,) + (None,)
             return ((-1,-1))
-
