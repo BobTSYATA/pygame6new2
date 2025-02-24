@@ -51,6 +51,8 @@ class Tester:
                 # Update troops
                 #environment.update_troop_units() # done in move
 
+                after_state = environment.get_next_state()
+
                 if player_1_done:
                     games += 1
                     end_of_game = True            
@@ -62,15 +64,18 @@ class Tester:
                 action_tuple_2 = player_2.get_Action(environment, "2", events)
                 reward2, player_2_done = environment.move(games_num,main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
 
+
+                
                 # Check if Player 2 is done
                 if player_2_done:
                     games += 1
                     end_of_game = True
                     break
-
+                after_state_2 = environment.get_next_state()
+                state = after_state_2
 
                 # Draw everything
-                environment.draw_header(False, main_surf)
+                # environment.draw_header(False, main_surf)
                 #screen.blit(main_surf, (0, 0))
                 #pygame.display.flip()
 
@@ -89,7 +94,7 @@ class Tester:
 
 
 if __name__ == '__main__':
-    RUN_NUM = 100#89
+    RUN_NUM = 102#100#89
     path = f"DataTraining/checkpoint{RUN_NUM}.pth" 
 
     env = Environment()

@@ -8,8 +8,8 @@ from Environment import Environment
 from State_ONLY_FOR_CALLING import State_ONLY_FOR_CALLING
 
 epsilon_start = 1
-epsilon_final = 0.05#0.01
-epsiln_decay = 2000# 5000
+epsilon_final = 0.01#0.05
+epsiln_decay = 5000# 2000
 
 class DQN_Agent:
     def __init__(self, parametes_path = None, train = True, env= None, player_num = 1):
@@ -29,7 +29,7 @@ class DQN_Agent:
               self.DQN.eval()
 
 
-    def get_Action(self, environment, state : State_ONLY_FOR_CALLING, epoch=0, events=None, train=True) -> tuple: #train=False ##########
+    def get_Action(self, environment, state : State_ONLY_FOR_CALLING, epoch=0, events=None, train=False) -> tuple: #train=False ##########
 
         # Get all possible actions for the agent
         #print("state.player: ",state.player)

@@ -64,7 +64,7 @@ def main():
     batch_size = 64#32#64#128#64#50 # idk why 64 it doesn't need to be the same as the DQN
     buffer = ReplayBuffer()
     learning_rate = 0.002 #0.001#0.00001 #0.001#0.0001#0.01#0.001#0.00001
-    ephocs = 30000#50000#100000#1000#100#200000
+    ephocs = 100000#50000#100000#1000#100#200000
     start_epoch = 1#0
     C = 100#200 #9#5#3
     avgLoss = 0
@@ -93,7 +93,7 @@ def main():
 
     step = 0
 
-    RUN_NUM = 100
+    RUN_NUM = 102 # from 100 to 102 changed gamma from 0.6 to 0.75, cahnged epsiln_decay to 5000 from 2000 and epsilon_final to 0.01 from 0.05. also, running 100k epochs instead of 30k.
     ######### checkpoint Load ############
     checkpoint_path = f"DataTraining/checkpoint{RUN_NUM}.pth" 
 
@@ -111,11 +111,11 @@ def main():
         "checkpoint": checkpoint_path,
         "learning_rate": learning_rate,
         "architecture": "FNN 136, 322, 468, 64",#128, 258, 512, 128, 64, 4
-        "Schedule": "2000, 3500, 5500, 7500, 9000 gamma=0.6", #1000, 2000, 3000, 5000, 7000, 9000
+        "Schedule": "2000, 3500, 5500, 7500, 9000 gamma=0.75", #1000, 2000, 3000, 5000, 7000, 9000
         "epochs": ephocs,
         "start_epoch": start_epoch,
         "decay": epsiln_decay,
-        "gamma": 0.6,
+        "gamma": 0.75,
         "batch_size": batch_size, 
         "C": C
         }

@@ -15,7 +15,7 @@ layer2 = 32#468
 # layer4 = 64  # Adjusted to match the output of linear5
 # layer5 = 64
 output_size = 1 # Q(s,a) #16#64#8 #9  # Q(state) -> 4 value of stay, left, right, shoot
-gamma = 0.6#0.85#0.99
+gamma = 0.75#0.6#0.85#0.99
 MSELoss = nn.MSELoss()
 
 class DQN(nn.Module):
