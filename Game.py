@@ -8,6 +8,9 @@ import numpy as np
 import cv2
 from DQN_Agent import DQN_Agent  # Import the DQN_Agent class
 
+
+# OLD NOT WORKING WITH TURN BASED GAMEPLAY 
+
 # Define the initial screen
 def start_screen():
     pygame.init()
@@ -217,8 +220,7 @@ def main(player1_type, player2_type):
             state=state
         )
         environment.draw_header(player_done, main_surf)
-        
-        #environment.all_possible_actions_for_agent(1)
+
 
         # Player 2's action
         action_tuple_random = player_2.get_Action(environment, player_num="2", events=events, state=state)

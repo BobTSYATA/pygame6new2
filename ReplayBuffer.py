@@ -10,19 +10,9 @@ class ReplayBuffer:
     def __init__(self, capacity= capacity) -> None:
         self.buffer = deque(maxlen=capacity)
 
-    #     self.buffer.append((state, action, reward, next_state, done))# idk how i should pass this on maybe tensor and numpy shaped / floats and ints, etc. TO DO: to check if they are tensors / np.array and if not to do like in checkers example # , done
     def push (self, state : State_ONLY_FOR_CALLING, action, reward, next_state : State_ONLY_FOR_CALLING, done): # at Trainer_wandb i don't give it a State
-        # print("state: ", state)
-        # print("action: ",action)
-        # print("")
-        # print("")
-        # print("")
-        # print(f"state.toTensor(): {state.toTensor()}, torch.from_numpy(np.array(action).reshape(-1,2)): {torch.from_numpy(np.array(action).reshape(-1,2))}, torch.tensor(reward): {torch.tensor(reward)}, next_state.toTensor(): {next_state.toTensor()}, torch.tensor(done): {torch.tensor(done)}")
-        # print(f"Stored transition: State {state.Graphics[:5]}, Action {action}, Reward {reward}, Next State {next_state.Graphics[:5]}, Done {done}")
         if not action == (-1,-1):
             self.buffer.append((state.toTensor(), torch.from_numpy(np.array(action).reshape(-1,2)), torch.tensor(reward), next_state.toTensor(), torch.tensor(done)))
-        # print("action: ", action)
-
 
     def sample (self, batch_size):
         if (batch_size > self.__len__()):

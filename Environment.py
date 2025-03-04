@@ -350,15 +350,7 @@ class Environment:
         # print("calling all_possible_actions_for_agent from  set_init_state")
         self.state.legal_actions = self.all_possible_actions_for_agent(num)#self.get_all_legal_Actions(self.state)
         return self.state
-    
-    # def next_state(self, state: State_ONLY_FOR_CALLING):
-    #     # next_state = state.copy()
-    #     # next_state.Graphics = next_state.init_state()  
-    #     # next_state.legal_actions = self.all_possible_actions_for_agent(self.state.player)#self.get_all_legal_Actions(self.state)
-    #     # next_state.switch_players()
-    #     self.state = State_ONLY_FOR_CALLING()
-    #     self.state.legal_actions = self.all_possible_actions_for_agent(self.state.player)
-    #     return self.state
+
 
 
     def running_while_troop_inbound(self, done, main_surf):

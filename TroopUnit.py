@@ -7,7 +7,6 @@ import cv2
 
 class TroopUnit(pygame.sprite.Sprite):
     neon_effects = {}
-    # TROOPUNIT_NUM = 0
 
     def __init__(self, pos, color, troop_count, destination) -> None:
         super().__init__()

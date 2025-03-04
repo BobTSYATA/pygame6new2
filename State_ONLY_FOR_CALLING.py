@@ -23,8 +23,8 @@ class State_ONLY_FOR_CALLING:
         #print(f"board_tensor: {board_tensor}, actions_tensor: {actions_tensor}")
         return board_tensor, actions_tensor
 
-    def tensorToState (environment, state_tensor, actions_tensor):# ,player = 1): # TO DO: to make sure the player num changes and not always 1
-        board = state_tensor.reshape([1,STATE_SIZE]).cpu().numpy() # 1,136
+    def tensorToState (environment, state_tensor, actions_tensor):# ,player = 1): 
+        board = state_tensor.reshape([1,STATE_SIZE]).cpu().numpy() 
         #print("actions_tensor: ", actions_tensor)
         actions = actions_tensor.reshape([-1,2]).cpu().numpy()
         actions = list(map(list, actions))
