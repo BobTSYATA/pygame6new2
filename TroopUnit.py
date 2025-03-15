@@ -23,8 +23,10 @@ class TroopUnit(pygame.sprite.Sprite):
         self.image = pygame.Surface((2 * TROOP_UNIT_RADIUS, 2 * TROOP_UNIT_RADIUS))
         self.rect = self.image.get_rect(midbottom=pos)
         self.mask = pygame.mask.from_surface(self.image)
-
         self.draw_troop_count()
+
+
+
 
     @staticmethod
     def create_neon_circle(radius, color):
@@ -65,7 +67,8 @@ class TroopUnit(pygame.sprite.Sprite):
         dy = self.destination[1] - self.rect.centery
         distance = math.sqrt(dx ** 2 + dy ** 2)
         # Check if the distance is less than a threshold (e.g., TROOP_UNIT_SPEED)
-        return distance < TROOP_UNIT_SPEED
+        same_pos = self.rect.centerx == self.destination[0] and self.destination[1] == self.rect.centery
+        return distance < TROOP_UNIT_SPEED or same_pos
 
     def draw(self, surface):
          # Draw cached neon glow

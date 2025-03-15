@@ -55,7 +55,7 @@ class Tester:
                     action_tuple_1 = player_1.get_Action(environment, state=state, events=events, train=False, epoch=games_num)
                     reward1, player_1_done = environment.move(games_num,self.main_surf, action_tuple_1, agent_type="DQN", player_num="1")
 
-                after_state = environment.get_next_state()
+                after_state = environment.get_next_state(player_num="2")#1, switched to 2 because im trying runnign Trainer_wandb_enemy.py for player2
 
                 if player_1_done:
                     games += 1
@@ -65,8 +65,14 @@ class Tester:
 
                 # Player 2's turn (only after Player 1’s action is resolved)
                 environment.draw_header(player_1_done, self.main_surf)
-                action_tuple_2 = player_2.get_Action(environment, "2", events=events)
-                reward2, player_2_done = environment.move(games_num,self.main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
+                if isinstance(self.player2, Random_Agent): 
+                    action_tuple_2 = player_2.get_Action(environment, "2", events=events)
+                    reward2, player_2_done = environment.move(games_num,self.main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
+                elif isinstance(self.player2, DQN_Agent):
+                    action_tuple_2 = player_2.get_Action(environment, state=state, events=events, train=False, epoch=games_num)
+                    reward2, player_2_done = environment.move(games_num,self.main_surf, action_tuple_2, agent_type="DQN", player_num="2")
+                    print("action_tuple_2: ", action_tuple_2)
+
 
 
                 
@@ -75,7 +81,7 @@ class Tester:
                     games += 1
                     end_of_game = True
                     break
-                after_state_2 = environment.get_next_state()
+                after_state_2 = environment.get_next_state(player_num="2") #1, switched to 2 because im trying runnign Trainer_wandb_enemy.py for player2
                 state = after_state_2
 
 
@@ -94,19 +100,13 @@ class Tester:
 
 
 # if __name__ == '__main__':
-#     RUN_NUM = 102#100#89
+#     RUN_NUM = 125#107#102 is the best, ran for 100k smoothest graph. 107 ran for 50k but still got 94-6 so still good.
 #     path = f"DataTraining/checkpoint{RUN_NUM}.pth" 
 
 #     env = Environment()
-#     player1 = DQN_Agent(train=False,parametes_path=path,player_num=1)
-#     player2 = Random_Agent()
-#     test = Tester(env,player1, player2)
+#     main_surf = pygame.Surface((WIDTH, HEIGHT - 100))
+#     main_surf.fill(LIGHTGRAY) 
+#     player1 = Random_Agent()#DQN_Agent(train=False,parametes_path=path,player_num=1)
+#     player2 = DQN_Agent(train=False,parametes_path=path,player_num=2)#Random_Agent()
+#     test = Tester(env,player1, player2,main_surf)
 #     print(test.test(100))
-
-
-
-
-
-
-
-

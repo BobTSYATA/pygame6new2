@@ -83,7 +83,7 @@ class DQN_Agent:
 
 
     def epsilon_greedy(self, epoch, start = epsilon_start, final=epsilon_final, decay=epsiln_decay):
-        print(f"DEBUG: epoch type = {type(epoch)}, value = {epoch}")  # Add this line
+        # print(f"DEBUG: epoch type = {type(epoch)}, value = {epoch}")  # Add this line
         res = final + (start - final) * math.exp(-1 * epoch/decay)
         return res
         

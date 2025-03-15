@@ -72,12 +72,13 @@ class Environment:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return False
-            return True
-            # keys = pygame.key.get_pressed()
-            # if keys[pygame.K_y]:
-            #     return True
-            # if keys[pygame.K_n]:
-            #     return False
+            # return True
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_y]:
+                return True
+            if keys[pygame.K_n]:
+                # pygame.quit()
+                return False
 
 
         
@@ -86,6 +87,7 @@ class Environment:
         self.header_surf.fill(BLUE)
 
         if done:
+            print("done = ",done)
             self.write(self.header_surf, f"End Of Game - Friendly I.N {self.FriendlyIslandNum} - Enemy I.N {self.EnemyIslandNum}", pos=(150, 0))
             self.write(self.header_surf, f"Friendly T.N {self.FriendlyTroopNum} - Enemy T.N {self.EnemyTroopNum}", pos=(150, 30))
             self.write(self.header_surf, "Another Game ?  Y / N", pos=(150, 60)) # 300, 60
@@ -94,10 +96,13 @@ class Environment:
 
     
             if self.another_game():
+                print("11111111")
                 self.restart()
                 self.reset_troop_units()
+                print("22222222")
             else:
                 self.should_close_game = True
+                # pygame.quit()
         else:
             self.update()
             # main_surf.blit(self.background_image, (0, 0))
@@ -231,6 +236,7 @@ class Environment:
         if agent_type == "Human_Agent":
             # Calculate the total number of troops to send from the selected islands
             total_troops_to_send = self.selected_friendly_islands.troops
+            # print("DEBUGGING: self.selected_friendly_islands.type: ", self.selected_friendly_islands.type, "self.selected_friendly_islands.color: ", self.selected_friendly_islands.color)# working
             #if self.EnemyTroopNum + self.FriendlyIslandNum + len(self.selected_enemy_islands)+ len(self.selected_friendly_islands) > MAX_TROOP_UNITS:
             if self.EnemyTroopNum + self.FriendlyTroopNum + 2 > MAX_TROOP_UNITS: # to make sure that for checking  i include the EnemyTroopNum Too unlike in this line and eveything else (after adding random agent) 
                 #print("Cannot send troops: exceeds maximum troop units limit. agent_type == Human_Agent")
@@ -245,12 +251,14 @@ class Environment:
                 #self.FriendlyTroopNum += 1
                # print("1 ADDING self.FriendlyTroopNum: ", self.FriendlyTroopNum)
                 from_island = self.selected_friendly_islands
+                # print("DEBUGGING: from_island.tpye: ", from_island.type, " from_island.color: ", from_island.color)
                 if from_island.troops > 0:
                     # Determine how many troops to send from this island
                     troops_to_send_from_island = min(from_island.troops, total_troops_to_send)
                     if troops_to_send_from_island > 0:  # Only proceed if we are actually sending troops
                         # Create and append troop unit
                         done = self.is_end_of_game()
+                        # print("DEBUGGING: from_island.color: ", from_island.color)
                         troop_unit = TroopUnit((from_island.x, from_island.y), from_island.color, troops_to_send_from_island, destination)
                         self.troop_units.append(troop_unit)
                         # Update the number of troops left to send
@@ -289,7 +297,7 @@ class Environment:
 
                             troop_unit = TroopUnit((from_island.x, from_island.y), from_island.color, troops_to_send_from_island, destination)
                             self.troop_units.append(troop_unit)
-                            # FOR THIS GAME TO BE TURN BASED FIRST THING I NEED TO DO IS TO WAIT UNTIL THIS TROOP UNIT THAT WAS JUST CREATED REACHES ITS DESTINATION and it's being done at update_troop_units
+                            # FOR THIS GAME TO BE TURN BASED FIRST THING I NEED TO DO IS TO WAIT UNTIL THIS TROOP UNIT THAT WAS JUST CREATED REACHES ITS DESTINATION 
 
 
                             total_troops_to_send -= troops_to_send_from_island
@@ -390,16 +398,22 @@ class Environment:
                                                 (island.y - troop_unit.destination[1]) ** 2) <= ISLAND_RADIUS), None)
         if destination_island:
             # Check troop type by its color to determine if it's friendly or enemy
+            boolean = troop_unit.color == ISLAND_COLORS["friendly"]
+            # print(f"DEBUGGING: troop unit reached destination, troop_unit.color: {troop_unit.color}. troop_unit.color == ISLAND_COLORS[friendly]: {boolean}")
             if troop_unit.color == ISLAND_COLORS["friendly"]:  # Friendly troop
+                # print("friendly troop unit arrived to destination")
                 if destination_island.type == FRIENDLY:
+                    # print("friendly troop unit to friendly island ADDING TROOPS")
                     destination_island.troops += troop_unit.troop_count
                 elif destination_island.type in [NEUTRAL, ENEMY]:
                     if troop_unit.troop_count > destination_island.troops:
+                        # print("friendly troop unit to friendly island CONQUERING")
                         destination_island.type = FRIENDLY
                         destination_island.color = ISLAND_COLORS["friendly"]
                         destination_island.troops = troop_unit.troop_count - destination_island.troops
                         self.FriendlyIslandNum += 1
                     else:
+                        # print("friendly troop unit to friendly island NEGATING TROOPS")
                         destination_island.troops -= troop_unit.troop_count
             elif troop_unit.color == ISLAND_COLORS["enemy"]:  # Enemy troop
                 if destination_island.type == ENEMY:
@@ -416,52 +430,57 @@ class Environment:
             # self.troop_units.remove(troop_unit)
 
 
-    def get_next_state(self):
+    def get_next_state(self, player_num):
         """Returns the current environment state representation after the last action."""
-        return self.set_init_state(player_num="1")  # Change player_num dynamically if needed
+        return self.set_init_state(player_num=player_num)#"1")  # Change player_num dynamically if needed
 
     def update_troop_units(self, player_num, main_surf):
         # reached_destination = []
+        Variable_Bool = True
 
-        # print("calling set_init_state from update_troop_units")
         # next_state = self.set_init_state(player_num) #needs to get the next_state somehow. # TO DO: TO REDO THIS IT NEEDS TO BE AT THE END OF UPDATE TROOP UNITS AND MAKE A NEW FUNCTION CALLED GET_NEXT_STATE FOR THIS
+        # print("called update_troop_units")
+        while Variable_Bool:#self.is_troop_moving():
+            for troop_unit in self.troop_units[:]:  # Iterate over a copy to avoid modification issues
+                if not troop_unit.has_reached_destination():
+                    # print("DEBUGGING: update_troop_units troop unit DIDN'T reach destination")
+                    done = self.is_end_of_game()
+                    if done == False:
+                        self.running_while_troop_inbound(done, main_surf)
 
-        
-        for troop_unit in self.troop_units[:]:  # Iterate over a copy to avoid modification issues
-            if not troop_unit.has_reached_destination():
-                done = self.is_end_of_game()
-                if done == False:
-                    self.running_while_troop_inbound(done, main_surf)
-                dx = troop_unit.destination[0] - (troop_unit.rect.x + troop_unit.rect.width / 2)
-                dy = troop_unit.destination[1] - (troop_unit.rect.y + troop_unit.rect.height / 2)
-                distance = max(1, math.sqrt(dx ** 2 + dy ** 2))
-                dx /= distance
-                dy /= distance
-                troop_unit.rect.x += dx * TROOP_UNIT_SPEED
-                troop_unit.rect.y += dy * TROOP_UNIT_SPEED
+                    dx = troop_unit.destination[0] - (troop_unit.rect.x + troop_unit.rect.width / 2)
+                    dy = troop_unit.destination[1] - (troop_unit.rect.y + troop_unit.rect.height / 2)
+                    distance = max(1, math.sqrt(dx ** 2 + dy ** 2))
+                    dx /= distance
+                    dy /= distance
+                    troop_unit.rect.x += dx * TROOP_UNIT_SPEED
+                    troop_unit.rect.y += dy * TROOP_UNIT_SPEED
+                    # print("before the if moving troop unit")
+                    # if troop_unit.has_reached_destination():
+                    #     print("inside the if")
+                    #     reached_destination.append(troop_unit)
+                # print("DEBUGGING: troop_unit.color: ", troop_unit.color)
+                if troop_unit.has_reached_destination():
+                    self.resolve_troop_arrival(troop_unit)  # Process conquest logic
+                    self.troop_units.remove(troop_unit)  # Remove after arrival
+                    Variable_Bool = False # because only 1 troop unit possible to send this works.
 
-                # if troop_unit_that_was_sent.has_reached_destination():
-                #     reached_destination.append(troop_unit_that_was_sent)
-                #     print("update_troop_units BREAKED because reached_destination: ", reached_destination)
-                #     break
-            if troop_unit.has_reached_destination():
-                self.resolve_troop_arrival(troop_unit)  # Process conquest logic
-                self.troop_units.remove(troop_unit)  # Remove after arrival
-
-
-        # for troop_unit in reached_destination:
-        #     self.resolve_troop_arrival(troop_unit)
-        self.troop_units = [troop_unit for troop_unit in self.troop_units if not troop_unit.has_reached_destination()]
-        self.troop_units = self.troop_units[:MAX_TROOP_UNITS]
-        self.update_FAndE_Troo_Num()
+            self.troop_units = [troop_unit for troop_unit in self.troop_units if not troop_unit.has_reached_destination()]
+            self.troop_units = self.troop_units[:MAX_TROOP_UNITS]
+            self.update_FAndE_Troo_Num()
 
         # return next_state
 
 
 
-    def is_troop_moving(self):
-        """Check if any troop is still moving towards its destination."""
-        return any(not troop.has_reached_destination() for troop in self.troop_units)
+    # def is_troop_moving(self):
+    #     """Check if any troop is still moving towards its destination."""
+    #     return any(not troop.has_reached_destination() for troop in self.troop_units)
+    
+    # def is_troop_moving(self):
+    #     """Check if any troop is still moving towards its destination."""
+    #     return any(not troop.has_reached_destination() for troop in self.troop_units)
+
 
 
     def update_FAndE_Troo_Num(self):
@@ -596,7 +615,7 @@ class Environment:
 
         if attacking_island:
             if agent_type == "Human_Agent":
-                self.send_troops(attacking_island,agent_type,player_num)
+                troop_unit_that_was_sent = self.send_troops(attacking_island,agent_type,player_num)
             elif agent_type == "Random_Agent" or agent_type == "DQN":
                 if player_num == "1":
                     total_troops = self.selected_friendly_islands.troops
@@ -663,18 +682,51 @@ class Environment:
                 elif player_num == "2":
                     total_troops = self.selected_enemy_islands.troops
                     if total_troops > 0:
-                        if attacking_island.type in [NEUTRAL, FRIENDLY]:
-                            defending_troops = attacking_island.troops 
-                            # if total_troops > defending_troops: # turn based game now so i can't reward based on enemys actions, i can't do it even if action based, this was wrong.
-                            #     island_with_least_troops = None
-                            #     least_troops_num = 999
-                            #     for island in self.islands:
-                            #         if island.troops < least_troops_num and island.type is not ENEMY:
-                            #             least_troops_num = island.troops
-                            #             island_with_least_troops = island
-                            #     if attacking_island == island_with_least_troops:
-                            #         reward -= 2
-                        # print(f"2 send_troops (self.selected_enemy_islands,attacking_island): {(self.get_island_index(self.selected_enemy_islands),self.get_island_index(attacking_island))}, source island troops: {self.selected_enemy_islands.troops}")
+                        if attacking_island.type in [NEUTRAL, FRIENDLY]:  
+                            defending_troops = attacking_island.troops  
+
+                            # Find the weakest neutral/enemy island
+                            weakest_friendly_island = None  
+                            weakest_neutral_island = None  
+                            least_troops_num = float('inf')  
+
+                            for island in self.islands:  
+                                if island.troops < least_troops_num and island.type is not ENEMY:  
+                                    least_troops_num = island.troops  
+                                    if island.type == FRIENDLY:  
+                                        weakest_friendly_island = island  
+                                    elif island.type == NEUTRAL:  
+                                        weakest_neutral_island = island  
+
+                            # If both an enemy and neutral island have the same lowest troops, prefer the enemy
+                            if weakest_friendly_island is not None and weakest_friendly_island.troops == least_troops_num:
+                                island_with_least_troops = weakest_friendly_island  
+                            else:
+                                island_with_least_troops = weakest_neutral_island  
+
+                            # Prioritize attacking enemies over neutrals
+                            if weakest_friendly_island is not None and weakest_neutral_island is not None:
+                                if attacking_island == island_with_least_troops:  
+                                    if attacking_island.type == FRIENDLY:
+                                        reward = 20
+                                    if attacking_island.type == NEUTRAL:
+                                        reward = -8
+                                    if total_troops > defending_troops: 
+                                        reward += 5
+                                    else:
+                                        reward -= 5 #+= 1 # unneeded i think # to give reward = 1 <-- TO DO THIS REWARD IF NOT WORKING
+                                else:  
+                                    reward = -8 
+                            else:
+                                if attacking_island == island_with_least_troops:  
+                                    if total_troops > defending_troops: 
+                                        reward = 10
+                                    # else: <-- TO DO THIS REWARD IF NOT WORKING
+                                    #     reward = 1 <-- TO DO THIS REWARD IF NOT WORKING
+                                else:  
+                                    reward = -10  
+                        else:  
+                            reward = -10  # Strong penalty for attacking a friendly island  
                         troop_unit_that_was_sent = self.send_troops(attacking_island,agent_type,player_num)
                     else:
                         print("NOT TRUE total_troops > 0 PLAYER 2")
@@ -684,20 +736,42 @@ class Environment:
 
 
                     # Wait for Player 1’s action to complete before switching turns
-        while self.is_troop_moving():
-            # print("troop is still moving")
-            self.update_troop_units(player_num, main_surf)
+        # print("troop is still moving")
+        # print("DEBUGGING: move function, troop unit still moving")
+        self.update_troop_units(player_num, main_surf)
 
         done = self.is_end_of_game()
         
+        # player num 1 just won so:
+        # done == true
+        # player_won = true (for player_num == 1)
+        # give reward to player_1_won +=1.
+        # if player num 1 lost:
+        # player_won = false (for player_num == 1)
+        # give reward to player_2_won +=1.
+        # and the opposite to player num 2, this fix is correct.
         if done:
-            player_won =  self.player_won("1")
+            player_won =  self.player_won("2")#1 changed because runnign player 2
             if player_won:
                 reward += 100
                 self.player_1_won += 1
             else:
                 reward += -100
                 self.player_2_won += 1
+        # if done:
+        #     player_won =  self.player_won(player_num)
+        #     if player_won:
+        #         reward += 100
+        #         if player_num == "1":
+        #             self.player_1_won += 1
+        #         elif player_num == "2":
+        #             self.player_2_won += 1
+        #     else:
+        #         reward += -100
+        #         if player_num == "2":
+        #             self.player_1_won += 1
+        #         elif player_num == "1":
+        #             self.player_2_won += 1
         # print(f"Epoch {epoch} | Done flag: {done} | Reward: {reward}")
         return reward, done#, next_state
 

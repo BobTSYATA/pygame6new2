@@ -125,7 +125,7 @@ def start_screen():
 
         # Draw buttons with neon effect when hovered for Player 2
         draw_button_with_glow(470, 300 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'Random' else colors['button'], 'Player 2: Random', small_font, player2_hover_random)
-        draw_button_with_glow(470, 370 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'DQN' else colors['button'], 'Player 2: DQN', small_font, player2_hover_dqn)
+        # draw_button_with_glow(470, 370 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'DQN' else colors['button'], 'Player 2: DQN', small_font, player2_hover_dqn)
 
         # Play button with neon effect
         play_button_hover = 300 < mouse_pos[0] < 500 and 500 < mouse_pos[1] < 560
@@ -156,13 +156,13 @@ def start_screen():
                 # Check Player 2 selections
                 if 470 < pos[0] < 740 and 300 - offset_y < pos[1] < 350 - offset_y:
                     player2_agent = 'Random'
-                if 470 < pos[0] < 740 and 370 - offset_y < pos[1] < 420 - offset_y:
-                    player2_agent = 'DQN'
+                # if 470 < pos[0] < 740 and 370 - offset_y < pos[1] < 420 - offset_y:
+                #     player2_agent = 'DQN'
         clock.tick(60)
 
 def main(player1_type, player2_type):
     pygame.init()
-    clock = pygame.time.Clock()
+    # clock = pygame.time.Clock()
     environment = Environment()
     main_surf = pygame.Surface((WIDTH, HEIGHT - 100))
     main_surf.fill(LIGHTGRAY)
@@ -173,69 +173,112 @@ def main(player1_type, player2_type):
     if player1_type == 'Human':
         player_1 = Human_Agent()
     elif player1_type == 'DQN':
-        player_1 = DQN_Agent()
+        RUN_NUM = 102#100#89
+        path = f"DataTraining/checkpoint{RUN_NUM}.pth" 
+        player_1 = DQN_Agent(train=False,parametes_path=path,player_num=1)
     elif player1_type == 'Random':
         player_1 = Random_Agent()
     
-    if player2_type == 'Human':
-        player_2 = Human_Agent()
-    elif player2_type == 'DQN':
-        player_2 = DQN_Agent()
-    elif player2_type == 'Random':
+    # if player2_type == 'Human':
+    #     player_2 = Human_Agent()
+    # elif player2_type == 'DQN':
+    #     player_2 = DQN_Agent()
+    if player2_type == 'Random':
         player_2 = Random_Agent()
-    run = True
-    while run:
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                run = False
+    done = False
 
-        clock.tick()
-        #print(clock.get_fps())
+    environment.restart()
+    after_state_2 = None
+    state = environment.set_init_state(player_num="1")
+    testing_done = False
 
-        # Get the current state from the environment
-        state = environment.state()
- 
-        # Player 1's action
-        action_tuple = player_1.get_Action(environment, player_num="1", events=events, state=state)
+    agent_type1 = "Random_Agent"
+    agent_type2 = "Random_Agent"
+    if player1_type == 'Human':
+        agent_type1 = "Human_Agent"
+    elif player1_type == "DQN":
+        agent_type1 = "DQN"
+    elif player1_type == "Random":
         agent_type1 = "Random_Agent"
+
+    if player2_type == 'Human':
+        agent_type2 = "Human_Agent"
+    elif player2_type == "DQN":
+        agent_type2 = "DQN"
+    elif player2_type == "Random":
         agent_type2 = "Random_Agent"
-        if player1_type == 'Human':
-            agent_type1 = "Human_Agent"
-        elif player1_type == "DQN":
-            agent_type1 = "DQN"
-        elif player1_type == "Random":
-            agent_type1 = "Random_Agent"
-
-        if player2_type == 'Human':
-            agent_type2 = "Human_Agent"
-        elif player2_type == "DQN":
-            agent_type2 = "DQN"
-        elif player2_type == "Random":
-            agent_type2 = "Random_Agent"
-        player_done = environment.move(
-            action_tuple,
-            agent_type=agent_type1,
-            player_num="1",
-            state=state
-        )
-        environment.draw_header(player_done, main_surf)
 
 
-        # Player 2's action
-        action_tuple_random = player_2.get_Action(environment, player_num="2", events=events, state=state)
-        player_done_random = environment.move(
-            action_tuple_random,
-            agent_type=agent_type2,
-            player_num="2",
-            state=state
-        )
-        environment.draw_header(player_done_random, main_surf)
+    while not testing_done: # done
+        environment.restart()
+        after_state_2 = None
+        state = environment.set_init_state(player_num="1")
+        done = False
+        while not done:
+
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    return
+
+            environment.draw_header(done, main_surf)
+            # Player 1's turn
+            if agent_type1 == "DQN":
+                action_tuple_1 = player_1.get_Action(environment, state=state, train=False, epoch=1)# events=events
+            elif agent_type1 == "Random_Agent" or agent_type1 == "Human_Agent":
+                action_tuple_1 = player_1.get_Action(environment, "1", events=events, state=state)# events=events
+            reward1, done = environment.move(1,main_surf, action_tuple_1, agent_type=agent_type1, player_num="1")
+
+            # clock.tick()
+            #print(clock.get_fps())
+
+            # Get the current state from the environment
+            after_state = environment.get_next_state()
+
+            if done: 
+                # print("done mid: ", done)
+                environment.draw_header(done, main_surf)
+                # break
+            print("player 2 turn: \n")
+            # Player 2's turn only random
+            environment.draw_header(done, main_surf)
+            action_tuple_2 = player_2.get_Action(environment, "2")#events
+            # print("action_tuple_2: ",action_tuple_2)
+            reward2, done = environment.move(1,main_surf, action_tuple_2, agent_type=agent_type2, player_num="2")
+    
+            # Player 1's action
+            # action_tuple = player_1.get_Action(environment, player_num="1", events=events, state=state)
         
-        if environment.should_close_game:
-            break  # Exit the game loop
+            # player_done = environment.move(
+            #     action_tuple_1,
+            #     agent_type=agent_type1,
+            #     player_num="1",
+            #     state=state
+            # )
+            # environment.draw_header(player_done, main_surf)
+            after_state_2 = environment.get_next_state()
+            reward = reward1 + reward2
+            state = after_state_2
+            # Player 2's action
+            # action_tuple_random = player_2.get_Action(environment, player_num="2", events=events, state=state)
+            # player_done_random = environment.move(
+            #     action_tuple_random,
+            #     agent_type=agent_type2,
+            #     player_num="2",
+            #     state=state
+            # )
+            # environment.draw_header(player_done_random, main_surf)
+            # print("done: ", done )
+            if environment.should_close_game:
+                testing_done = True
+                break  # Exit the game loop
+            print("end of step \n\n\n")
 
 if __name__ == "__main__":
     player1_type, player2_type = start_screen()
     if player1_type and player2_type:
         main(player1_type, player2_type)
+
+
+# Game.py is working, gives an error that i can but lazy to fix when N clicked to close the game to fix it later on if needed.
+# only thing that doesn't work: when an island can be random/human/dqn, it seems that if the island sends troops to itself they disappear and not being added correctly so to fix this bug and then: traing player 2. and then maybe action paced. we will see.

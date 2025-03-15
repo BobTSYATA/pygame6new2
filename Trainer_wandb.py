@@ -45,7 +45,7 @@ def save_episode_data(epoch, player_1_actions, player_2_actions, player_1_reward
         f.write("=" * 50 + "\n")
 
 
-RUN_NUM = 105
+RUN_NUM = 124 # 120 run_num == testing with new tester player1 and player2 positions. # 107 run_num == testing after changes #102 best run
 
 path_load= None
 path_Save=f'DataTraining/params_{RUN_NUM}.pth'
@@ -54,6 +54,7 @@ buffer_path = f'DataTraining/buffer_{RUN_NUM}.pth'
 results_path=f'DataTraining/results_{RUN_NUM}.pth'
 random_results_path = f'DataTraining/random_results_{RUN_NUM}.pth'
 path_best_random = f'DataTraining/best_random_params_{RUN_NUM}.pth'
+
 
 
 def main():
@@ -76,7 +77,7 @@ def main():
     batch_size = 64
     buffer = ReplayBuffer()
     learning_rate = 0.002 #0.001#0.00001 #0.001#0.0001#0.01#0.001#0.00001
-    ephocs = 1000#100000#50000#100000#1000#100#200000
+    ephocs = 50000#1000#100000#50000#100000#1000#100#200000
     start_epoch = 1#0
     C = 100#200 #9#5#3
     avgLoss = 0
@@ -84,7 +85,7 @@ def main():
     loss_count = 0
 
 
-    tester = Tester(player1=Random_Agent(), player2=player2, env=environment,main_surf=main_surf)
+    tester = Tester(player1=Random_Agent(), player2=player2, env=environment,main_surf=main_surf)#Tester(player1=player, player2=Random_Agent(), env=environment,main_surf=main_surf)
     tester_fix = Tester(player1=player, player2=player2, env=environment,main_surf=main_surf)
     random_results = []
     results = []
@@ -166,7 +167,7 @@ def main():
             states_graphics.append(state.Graphics)
 
 
-            after_state = environment.get_next_state()
+            after_state = environment.get_next_state(player_num="1")
             
             if done:
                 buffer.push(state, action_tuple_1, reward1, after_state, done) 
@@ -182,7 +183,7 @@ def main():
             player_2_rewards.append(reward2)
             next_states_graphics.append(after_state.Graphics)
 
-            after_state_2 = environment.get_next_state()
+            after_state_2 = environment.get_next_state(player_num="1")# not supposed to give it player_num="2"? how did it work until now? testing for player num 2
             reward = reward1 + reward2 # needs to be used for the second buffer.push
 
             # if done:
