@@ -23,16 +23,13 @@ class Tester:
         player_1 = self.player1  
         player_2 = self.player2
         environment = self.env
-        # pygame.init()
-        # environment = Environment()
-        # main_surf = pygame.Surface((WIDTH, HEIGHT - 100))
-        # main_surf.fill(LIGHTGRAY)
+
 
         while games < games_num:
             done = False
             print(f"Starting game {games + 1}")
             end_of_game = False
-            # Reset environment for the next game
+
             environment.restart()
             after_state_2 = None
             state = environment.set_init_state(player_num="1")
@@ -48,14 +45,14 @@ class Tester:
                 
                 environment.draw_header(done, self.main_surf)
                 # Player 1's turn
-                if isinstance(self.player1, Random_Agent):
+                if isinstance(self.player1, Random_Agent) or isinstance(self.player1, Baseline_Agent):
                     action_tuple_1 = player_1.get_Action(environment, "1", events=events)
                     reward1, player_1_done = environment.move(games_num,self.main_surf, action_tuple_1, agent_type="Random_Agent", player_num="1")
                 elif isinstance(self.player1, DQN_Agent):
                     action_tuple_1 = player_1.get_Action(environment, state=state, events=events, train=False, epoch=games_num)
                     reward1, player_1_done = environment.move(games_num,self.main_surf, action_tuple_1, agent_type="DQN", player_num="1")
 
-                after_state = environment.get_next_state(player_num="2")#1, switched to 2 because im trying runnign Trainer_wandb_enemy.py for player2
+                after_state = environment.get_next_state(player_num="2")
 
                 if player_1_done:
                     games += 1
@@ -65,23 +62,20 @@ class Tester:
 
                 # Player 2's turn (only after Player 1’s action is resolved)
                 environment.draw_header(player_1_done, self.main_surf)
-                if isinstance(self.player2, Random_Agent): 
+                if isinstance(self.player2, Random_Agent) or isinstance(self.player2, Baseline_Agent): 
                     action_tuple_2 = player_2.get_Action(environment, "2", events=events)
                     reward2, player_2_done = environment.move(games_num,self.main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
                 elif isinstance(self.player2, DQN_Agent):
                     action_tuple_2 = player_2.get_Action(environment, state=state, events=events, train=False, epoch=games_num)
                     reward2, player_2_done = environment.move(games_num,self.main_surf, action_tuple_2, agent_type="DQN", player_num="2")
                     print("action_tuple_2: ", action_tuple_2)
-
-
-
                 
                 # Check if Player 2 is done
                 if player_2_done:
                     games += 1
                     end_of_game = True
                     break
-                after_state_2 = environment.get_next_state(player_num="2") #1, switched to 2 because im trying runnign Trainer_wandb_enemy.py for player2
+                after_state_2 = environment.get_next_state(player_num="2") 
                 state = after_state_2
 
 
@@ -90,7 +84,6 @@ class Tester:
             print(f"Player 1 Wins: {environment.player_1_won}, Player 2 Wins: {environment.player_2_won}")
             print(f"Games Played: {games}/{games_num}")
 
-        # pygame.quit()
         print(f"Final Results: Player 1 Wins: {environment.player_1_won}, Player 2 Wins: {environment.player_2_won}")
         return environment.player_1_won, environment.player_2_won
 

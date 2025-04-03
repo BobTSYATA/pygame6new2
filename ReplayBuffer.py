@@ -4,13 +4,13 @@ import torch
 import numpy as np
 from State_ONLY_FOR_CALLING import State_ONLY_FOR_CALLING
 
-capacity = 100000#500000
+capacity = 100000
 
 class ReplayBuffer:
     def __init__(self, capacity= capacity) -> None:
         self.buffer = deque(maxlen=capacity)
 
-    def push (self, state : State_ONLY_FOR_CALLING, action, reward, next_state : State_ONLY_FOR_CALLING, done): # at Trainer_wandb i don't give it a State
+    def push (self, state : State_ONLY_FOR_CALLING, action, reward, next_state : State_ONLY_FOR_CALLING, done): 
         if not action == (-1,-1):
             self.buffer.append((state.toTensor(), torch.from_numpy(np.array(action).reshape(-1,2)), torch.tensor(reward), next_state.toTensor(), torch.tensor(done)))
 

@@ -29,7 +29,7 @@ class DQN_Agent:
               self.DQN.eval()
 
 
-    def get_Action(self, environment, state : State_ONLY_FOR_CALLING, epoch=0, events=None, train=False) -> tuple: #train=False ##########
+    def get_Action(self, environment, state : State_ONLY_FOR_CALLING, epoch=0, events=None, train=False) -> tuple:
 
         actions = environment.all_possible_actions_for_agent(self.player)
         if len(actions) == 0:
@@ -83,7 +83,6 @@ class DQN_Agent:
 
 
     def epsilon_greedy(self, epoch, start = epsilon_start, final=epsilon_final, decay=epsiln_decay):
-        # print(f"DEBUG: epoch type = {type(epoch)}, value = {epoch}")  # Add this line
         res = final + (start - final) * math.exp(-1 * epoch/decay)
         return res
         

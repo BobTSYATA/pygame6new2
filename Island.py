@@ -18,11 +18,7 @@ class Island(pygame.sprite.Sprite):
         self.color = color
         self.type = island_type
         self.troops = troop_num
-        # if self.type == NEUTRAL:
-        #     self.troops = START_TROOPS - 6
-        # else:
-        #     self.troops = START_TROOPS
-        
+
         # Initialize rect based on position and radius (make sure it's centered)
         self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
 

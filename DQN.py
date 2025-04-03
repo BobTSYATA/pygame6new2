@@ -29,7 +29,7 @@ class DQN(nn.Module):
         x = self.output(x)
         return x
     
-    def loss (self, Q_values, rewards, Q_next_Values, dones):#, dones
+    def loss (self, Q_values, rewards, Q_next_Values, dones):
         Q_target = rewards + gamma * Q_next_Values * (1 - dones)
         return MSELoss(Q_values, Q_target)
     

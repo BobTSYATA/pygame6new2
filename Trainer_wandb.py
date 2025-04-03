@@ -5,13 +5,9 @@ from Environment import Environment
 from DQN_Agent import DQN_Agent
 from ReplayBuffer import ReplayBuffer
 from Random_Agent import Random_Agent
-# from Human_Agent import Human_Agent
-# from Baseline_Agent import Baseline_Agent
-# from TroopUnit import TroopUnit
+from Baseline_Agent import Baseline_Agent
 from DQN import DQN
-# import os
 import wandb
-# from State_ONLY_FOR_CALLING import State_ONLY_FOR_CALLING
 from Tester import Tester
 
 
@@ -45,7 +41,7 @@ def save_episode_data(epoch, player_1_actions, player_2_actions, player_1_reward
         f.write("=" * 50 + "\n")
 
 
-RUN_NUM = 124 # 120 run_num == testing with new tester player1 and player2 positions. # 107 run_num == testing after changes #102 best run
+RUN_NUM = 129 # 126 == enemy run, 129 == last run hopefully before finish, running against BaseLineAgent #124 # 120 run_num == testing with new tester player1 and player2 positions. # 107 run_num == testing after changes #102 best run
 
 path_load= None
 path_Save=f'DataTraining/params_{RUN_NUM}.pth'
@@ -71,21 +67,21 @@ def main():
 
 
     # Initialize Player 2 with a specific agent type (Human, Random, DQN)
-    player2 = Random_Agent()
-    # player2 = Baseline_Agent()
+    # player2 = Random_Agent()
+    player2 = Baseline_Agent()
 
     batch_size = 64
     buffer = ReplayBuffer()
-    learning_rate = 0.002 #0.001#0.00001 #0.001#0.0001#0.01#0.001#0.00001
-    ephocs = 50000#1000#100000#50000#100000#1000#100#200000
-    start_epoch = 1#0
-    C = 100#200 #9#5#3
+    learning_rate = 0.002
+    ephocs = 80000
+    start_epoch = 1
+    C = 100
     avgLoss = 0
     loss = torch.Tensor([0])
     loss_count = 0
 
 
-    tester = Tester(player1=Random_Agent(), player2=player2, env=environment,main_surf=main_surf)#Tester(player1=player, player2=Random_Agent(), env=environment,main_surf=main_surf)
+    tester = Tester(player1=Baseline_Agent(), player2=player2, env=environment,main_surf=main_surf)
     tester_fix = Tester(player1=player, player2=player2, env=environment,main_surf=main_surf)
     random_results = []
     results = []
@@ -94,12 +90,12 @@ def main():
     best_res = -200
 
 
-    epsiln_decay = 2000 # same one as in DQN_Agent
+    epsiln_decay = 2000
 
     avglosses = []
     
 
-    optim = torch.optim.Adam(Q.parameters(), lr=learning_rate)#, weight_decay=0.0005)
+    optim = torch.optim.Adam(Q.parameters(), lr=learning_rate)
 
     step = 0
 
@@ -175,7 +171,7 @@ def main():
 
             # Player 2's turn
             environment.draw_header(done, main_surf)
-            action_tuple_2 = player2.get_Action(environment, "2")#events
+            action_tuple_2 = player2.get_Action(environment, "2")
             reward2, done = environment.move(epoch,main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
 
             # Record data for Player 2
@@ -183,16 +179,13 @@ def main():
             player_2_rewards.append(reward2)
             next_states_graphics.append(after_state.Graphics)
 
-            after_state_2 = environment.get_next_state(player_num="1")# not supposed to give it player_num="2"? how did it work until now? testing for player num 2
-            reward = reward1 + reward2 # needs to be used for the second buffer.push
-
-            # if done:
-            #     print("done_2: ", done)
+            after_state_2 = environment.get_next_state(player_num="1")
+            reward = reward1 + reward2
 
 
             buffer.push(state, action_tuple_1, reward, after_state_2, done)
 
-            state = after_state_2 # might cause problems 
+            state = after_state_2 
 
 
 
@@ -222,7 +215,7 @@ def main():
                 avgLoss += (loss.item()-avgLoss)* 0.00001
                 
 
-        if (epoch+1) % 500 == 0:  # Check every 500 epochs
+        if (epoch+1) % 500 == 0:
             print(f"Epoch {epoch} | Q-value range: min={Q_values.min().item()}, max={Q_values.max().item()}")
 
         if epoch % 458 == 0:
@@ -251,7 +244,6 @@ def main():
 
             results.append(res)
 
-            # print("===>> player_1_wins: ", environment.player_1_won, " player_2_wins: ", environment.player_2_won)
             differential = environment.player_1_won - environment.player_2_won
             log_metrics(epoch, avgLoss, environment, environment.player_1_won, environment.player_2_won,differential)
 
@@ -263,7 +255,6 @@ def main():
 
         if (epoch+1) % 4986 == 0:
             torch.save({'epoch': epoch, 'results': results, 'avglosses':avglosses}, results_path)
-            # torch.save(buffer, buffer_path)
             player.save_param(path_Save)
             torch.save(random_results, random_results_path)
 
