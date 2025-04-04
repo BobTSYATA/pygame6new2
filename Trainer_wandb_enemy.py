@@ -9,6 +9,8 @@ from DQN import DQN
 import wandb
 from Tester import Tester
 
+# environment script line 623  
+
 def log_metrics(epoch, avgloss, environment, player_1_wins, player_2_wins,differential):
     wandb.log({
         "avgloss": avgloss,

@@ -88,6 +88,7 @@ class Environment:
                 self.restart()
                 self.reset_troop_units()
             else:
+                print("self.should_close_game = True")
                 self.should_close_game = True
         else:
             self.update()
@@ -619,7 +620,7 @@ class Environment:
         done = self.is_end_of_game()
       
         if done:
-            player_won =  self.player_won("2")#1 changed because runnign player 2
+            player_won =  self.player_won("1")#2 #changed from 1 to 2 because runnign player 2
             if player_won:
                 reward += 100
                 self.player_1_won += 1

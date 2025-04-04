@@ -210,7 +210,9 @@ def main(player1_type, player2_type):
         state = environment.set_init_state(player_num="1")
         done = False
         while not done:
-
+            if environment.should_close_game:
+                testing_done = True
+                break  # Exit the game loop
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
@@ -225,10 +227,11 @@ def main(player1_type, player2_type):
             reward1, done = environment.move(1,main_surf, action_tuple_1, agent_type=agent_type1, player_num="1")
 
             # Get the current state from the environment
-            after_state = environment.get_next_state()
+            after_state = environment.get_next_state(player_num="1")
 
             if done: 
                 environment.draw_header(done, main_surf)
+                break
 
             print("player 2 turn: \n")
             # Player 2's turn only random
@@ -237,10 +240,12 @@ def main(player1_type, player2_type):
 
             reward2, done = environment.move(1,main_surf, action_tuple_2, agent_type=agent_type2, player_num="2")
 
-            after_state_2 = environment.get_next_state()
+            after_state_2 = environment.get_next_state(player_num="1")
             reward = reward1 + reward2
             state = after_state_2
-
+            if done: 
+                environment.draw_header(done, main_surf)
+                break
             if environment.should_close_game:
                 testing_done = True
                 break  # Exit the game loop
