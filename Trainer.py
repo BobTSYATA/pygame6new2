@@ -81,7 +81,7 @@ def main():
 
 
 
-            after_state = environment.get_next_state()
+            after_state = environment.get_next_state(player_num="1")
             
             if done:
                 buffer.push(state, action_tuple_1, reward1, after_state, done) 
@@ -93,7 +93,7 @@ def main():
             reward2, done = environment.move(epoch,main_surf, action_tuple_2, agent_type="Random_Agent", player_num="2")
 
 
-            after_state_2 = environment.get_next_state()
+            after_state_2 = environment.get_next_state(player_num="1")
             reward = reward1 + reward2 
 
 
