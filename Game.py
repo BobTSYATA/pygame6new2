@@ -123,7 +123,7 @@ def start_screen():
 
         # Draw buttons with neon effect when hovered for Player 2
         draw_button_with_glow(470, 300 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'Random' else colors['button'], 'Player 2: Random', small_font, player2_hover_random)
-        # draw_button_with_glow(470, 370 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'DQN' else colors['button'], 'Player 2: DQN', small_font, player2_hover_dqn)
+        draw_button_with_glow(470, 370 - offset_y, 270, 50, colors['highlight'] if player2_agent == 'DQN' else colors['button'], 'Player 2: DQN', small_font, player2_hover_dqn)
 
         # Play button with neon effect
         play_button_hover = 300 < mouse_pos[0] < 500 and 500 < mouse_pos[1] < 560
@@ -154,8 +154,8 @@ def start_screen():
                 # Check Player 2 selections
                 if 470 < pos[0] < 740 and 300 - offset_y < pos[1] < 350 - offset_y:
                     player2_agent = 'Random'
-                # if 470 < pos[0] < 740 and 370 - offset_y < pos[1] < 420 - offset_y:
-                #     player2_agent = 'DQN'
+                if 470 < pos[0] < 740 and 370 - offset_y < pos[1] < 420 - offset_y:
+                    player2_agent = 'DQN'
         clock.tick(60)
 
 def main(player1_type, player2_type):
@@ -176,10 +176,12 @@ def main(player1_type, player2_type):
     
     # if player2_type == 'Human':
     #     player_2 = Human_Agent()
-    # elif player2_type == 'DQN':
-    #     player_2 = DQN_Agent()
     if player2_type == 'Random':
         player_2 = Random_Agent()
+    elif player2_type == 'DQN':
+        RUN_NUM_ENEMY = 129 #129 for enemy but it's bad because it got worse at the end because i overtrained it.
+        path = f"DataTraining/checkpoint{RUN_NUM_ENEMY}.pth"
+        player_2 = DQN_Agent(parametes_path=path, train=False,player_num=2)
     done = False
 
     environment.restart()
@@ -227,7 +229,7 @@ def main(player1_type, player2_type):
             reward1, done = environment.move(1,main_surf, action_tuple_1, agent_type=agent_type1, player_num="1")
 
             # Get the current state from the environment
-            after_state = environment.get_next_state(player_num="1")
+            after_state = environment.get_next_state(player_num="2") # 1, doesn't matter
 
             if done: 
                 environment.draw_header(done, main_surf)
@@ -236,11 +238,16 @@ def main(player1_type, player2_type):
             print("player 2 turn: \n")
             # Player 2's turn only random
             environment.draw_header(done, main_surf)
-            action_tuple_2 = player_2.get_Action(environment, "2")
+            if agent_type2 == "DQN":
+                action_tuple_2 = player_2.get_Action(environment, state=state, train=False, epoch=1)
+            elif agent_type2 == "Random_Agent" or agent_type2 == "Human_Agent":
+                action_tuple_2 = player_2.get_Action(environment, "2", events=events, state=state)
+
+            # action_tuple_2 = player_2.get_Action(environment, "2")
 
             reward2, done = environment.move(1,main_surf, action_tuple_2, agent_type=agent_type2, player_num="2")
 
-            after_state_2 = environment.get_next_state(player_num="1")
+            after_state_2 = environment.get_next_state(player_num="2") # 1, doesn't matter
             reward = reward1 + reward2
             state = after_state_2
             if done: 

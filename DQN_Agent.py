@@ -12,7 +12,7 @@ epsilon_final = 0.01#0.05
 epsiln_decay = 5000# 2000
 
 class DQN_Agent:
-    def __init__(self, parametes_path = None, train = True, env= None, player_num = 1):
+    def __init__(self, parametes_path = None, train = True, env= None, player_num = None):
         self.DQN = DQN()
         if parametes_path:
             self.DQN.load_params(parametes_path)

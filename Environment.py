@@ -348,7 +348,8 @@ class Environment:
                         destination_island.type = FRIENDLY
                         destination_island.color = ISLAND_COLORS["friendly"]
                         destination_island.troops = troop_unit.troop_count - destination_island.troops
-                        self.FriendlyIslandNum += 1
+                        # print("FriendlyIslandNum: ",self.FriendlyIslandNum)
+                        # self.FriendlyIslandNum += 1
                     else:
                         # print("friendly troop unit to friendly island NEGATING TROOPS")
                         destination_island.troops -= troop_unit.troop_count
@@ -360,7 +361,10 @@ class Environment:
                         destination_island.type = ENEMY
                         destination_island.color = ISLAND_COLORS["enemy"]
                         destination_island.troops = troop_unit.troop_count - destination_island.troops
-                        self.EnemyIslandNum += 1
+                        # self.EnemyIslandNum += 1
+
+                        # if destination_island.type == FRIENDLY:
+                        #     self.FriendlyIslandNum -= 1
                     else:
                         destination_island.troops -= troop_unit.troop_count
 
@@ -396,8 +400,19 @@ class Environment:
             self.troop_units = [troop_unit for troop_unit in self.troop_units if not troop_unit.has_reached_destination()]
             self.troop_units = self.troop_units[:MAX_TROOP_UNITS]
             self.update_FAndE_Troo_Num()
+            self.updateFIAndEI_Num()
 
-
+    def updateFIAndEI_Num(self):
+        FriendlyIslandNum = 0
+        EnemyIslandNum = 0
+        for island in self.islands:
+            if island.color == ISLAND_COLORS["friendly"]:
+                FriendlyIslandNum += 1
+            elif island.color == ISLAND_COLORS["enemy"]:
+                EnemyIslandNum += 1
+        self.FriendlyIslandNum = FriendlyIslandNum
+        self.EnemyIslandNum = EnemyIslandNum
+        
     def update_FAndE_Troo_Num(self):
         friendlyTroopsNum = 0
         enemyTroopsNum = 0
@@ -614,13 +629,13 @@ class Environment:
         
         self.EnemyIslandNum = sum(1 for island in self.islands if island.type == ENEMY)
         self.FriendlyIslandNum = sum(1 for island in self.islands if island.type == FRIENDLY)
-
+        print("self.FriendlyIslandNum: ", self.FriendlyIslandNum)
         self.update_troop_units(player_num, main_surf)
 
         done = self.is_end_of_game()
       
         if done:
-            player_won =  self.player_won("1")#2 #changed from 1 to 2 because runnign player 2
+            player_won =  self.player_won("2")#2 #changed from 1 to 2 because runnign player 2, doesn't matter for Game.py
             if player_won:
                 reward += 100
                 self.player_1_won += 1
