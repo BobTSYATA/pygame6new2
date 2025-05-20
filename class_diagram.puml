@@ -1,0 +1,144 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Baseline_Agent {
+    +__init__()
+    +get_Action()
+}
+class CONSTANTS <<module>> {
+}
+class DQN {
+    +__call__()
+    +__init__()
+    +copy()
+    +forward()
+    +load_params()
+    +loss()
+    +save_params()
+}
+class DQN_Agent {
+    +__call__()
+    +__init__()
+    +epsilon_greedy()
+    +fix_update()
+    +get_Action()
+    +get_actions()
+    +loadModel()
+    +load_params()
+    +save_param()
+    +setTrainMode()
+}
+class Environment {
+    +__init__()
+    +all_possible_actions_for_agent()
+    +another_game()
+    +draw()
+    +draw_header()
+    +draw_troop_units()
+    +generate_islands()
+    +generate_troops()
+    +get_all_enemy_islands()
+    +get_all_friendly_islands()
+    +get_all_islands()
+    +get_clicked_island()
+    +get_island_index()
+    +get_next_state()
+    +get_possible_actions()
+    +initialize_state_tensor()
+    +is_end_of_game()
+    +legal()
+    +move()
+    +player_won()
+    +reset_troop_units()
+    +resolve_troop_arrival()
+    +restart()
+    +running_while_troop_inbound()
+    +send_troops()
+    +set_init_state()
+    +update()
+    +updateFIAndEI_Num()
+    +update_FAndE_Troo_Num()
+    +update_troop_units()
+    +write()
+}
+class Game <<module>> {
+}
+class Human_Agent {
+    +__init__()
+    +get_Action()
+}
+class Island {
+    +__init__()
+    +create_neon_circle()
+    +draw()
+}
+class ClassInfo {
+    +__init__()
+}
+class Random_Agent {
+    +__init__()
+    +get_Action()
+}
+class ReplayBuffer {
+    +__init__()
+    +__len__()
+    +push()
+    +sample()
+}
+class State_ONLY_FOR_CALLING {
+    +__init__()
+    +init_state()
+    +initialize_state_tensor()
+    +tensorToState()
+    +toTensor()
+}
+class Tester {
+    +__call__()
+    +__init__()
+    +test()
+}
+class Trainer <<module>> {
+}
+class Trainer_wandb <<module>> {
+}
+class Trainer_wandb_enemy <<module>> {
+}
+class TroopUnit {
+    +__init__()
+    +create_neon_circle()
+    +draw()
+    +draw_troop_count()
+    +has_reached_destination()
+}
+State_ONLY_FOR_CALLING ..> DQN_Agent
+DQN ..> DQN_Agent
+Island ..> Environment
+State_ONLY_FOR_CALLING ..> Environment
+TroopUnit ..> Environment
+DQN_Agent ..> Game
+Random_Agent ..> Game
+Environment ..> Game
+Human_Agent ..> Game
+State_ONLY_FOR_CALLING ..> ReplayBuffer
+Random_Agent ..> Tester
+DQN_Agent ..> Tester
+Baseline_Agent ..> Tester
+Random_Agent ..> Trainer
+DQN_Agent ..> Trainer
+ReplayBuffer ..> Trainer
+Environment ..> Trainer
+DQN ..> Trainer
+DQN_Agent ..> Trainer_wandb
+Baseline_Agent ..> Trainer_wandb
+Tester ..> Trainer_wandb
+ReplayBuffer ..> Trainer_wandb
+Environment ..> Trainer_wandb
+DQN ..> Trainer_wandb
+DQN_Agent ..> Trainer_wandb_enemy
+Tester ..> Trainer_wandb_enemy
+Random_Agent ..> Trainer_wandb_enemy
+ReplayBuffer ..> Trainer_wandb_enemy
+Environment ..> Trainer_wandb_enemy
+DQN ..> Trainer_wandb_enemy
+
+@enduml
